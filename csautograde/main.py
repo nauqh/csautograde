@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import json
+import requests
 import sqlite3
 from csautograde.utils import Utils
 
