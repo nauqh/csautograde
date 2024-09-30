@@ -142,7 +142,7 @@ class Utils():
             return 0
 
     @classmethod
-    def check_sql(cls, answer, solution, connection=None):
+    def check_sql(cls, answer, solution, q_index, connection=None):
         if not connection:
             cls.printt("No database connection input")
             return 'INVALID'
@@ -158,7 +158,7 @@ class Utils():
                 return True
             return False
         except Exception as e:
-            cls.printt(f'Something went wrong. {e}')
+            cls.printt(f'Something went wrong for question {q_index}: {e}')
             return False
 
     @classmethod

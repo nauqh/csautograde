@@ -63,7 +63,7 @@ class M11Marker(ExamMarkerBase):
 
             if answer:
                 if is_sql:
-                    correct = Utils.check_sql(answer, solution, self.conn)
+                    correct = Utils.check_sql(answer, solution, i, self.conn)
                 else:
                     correct = answer == solution
 
