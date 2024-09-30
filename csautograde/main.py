@@ -52,8 +52,9 @@ class M11Marker(ExamMarkerBase):
         self.conn = sqlite3.connect("northwind.db")
 
     def get_solutions(self):
-        with open('solutions/M11.json', 'r') as file:
-            return json.load(file)
+        response = requests.get(
+            'https://raw.githubusercontent.com/nauqh/csautograde/refs/heads/master/solutions/M11.json')
+        return response.json()
 
     def check_submission(self, submission, is_sql=False, start_index=1):
         for i, answer in enumerate(submission, start_index):
