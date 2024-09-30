@@ -89,7 +89,11 @@ class M11Marker(ExamMarkerBase):
         for key, value in summary.items():
             print(f"{key}: {len(value)}")
             for question in value:
-                score = f"{self.calculate_score(question)}/{self.calculate_score(question)}" if key == 'Correct' else "0"
+                score = (
+                    f"{self.calculate_score(question)}/{self.calculate_score(question)}"
+                    if key == 'Correct'
+                    else f"0/{self.calculate_score(question)}"
+                )
                 print(f"  - Q{question} ({score})")
 
         final_score = self.calculate_final_score()
