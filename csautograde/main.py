@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from csautograde.utils import Utils
+from utils import Utils
 
 
 class ExamMarkerBase(ABC):
@@ -36,6 +36,31 @@ class ExamMarkerBase(ABC):
             self.summary['Correct'].append(question_number)
         else:
             self.summary['Incorrect'].append(question_number)
+
+    def calculate_score(self, question_number):
+        for question_range, score in self.QUESTION_SCORES.items():
+            if question_number in question_range:
+                return score
+        return 0
+
+    def calculate_final_score(self):
+        return sum(self.calculate_score(q) for q in self.summary['Correct'])
+
+    def display_summary(self, summary):
+        print(f"{self.exam_name} - EXAM SUMMARY")
+
+        for key, value in summary.items():
+            print(f"{key}: {len(value)}")
+            for question in value:
+                score = (
+                    f"{self.calculate_score(question)}/{self.calculate_score(question)}"
+                    if key == 'Correct'
+                    else f"0/{self.calculate_score(question)}"
+                )
+                print(f"  - Q{question} ({score})")
+
+        final_score = self.calculate_final_score()
+        print(f"FINAL SCORE: {final_score}/100")
 
 
 class M11Marker(ExamMarkerBase):
@@ -73,31 +98,6 @@ class M11Marker(ExamMarkerBase):
         self.check_submission(submission[:5], is_sql=False, start_index=1)
         self.check_submission(submission[5:], is_sql=True, start_index=6)
         return self.summary
-
-    def calculate_score(self, question_number):
-        for question_range, score in self.QUESTION_SCORES.items():
-            if question_number in question_range:
-                return score
-        return 0
-
-    def calculate_final_score(self):
-        return sum(self.calculate_score(q) for q in self.summary['Correct'])
-
-    def display_summary(self, summary):
-        print(f"{self.exam_name} - EXAM SUMMARY")
-
-        for key, value in summary.items():
-            print(f"{key}: {len(value)}")
-            for question in value:
-                score = (
-                    f"{self.calculate_score(question)}/{self.calculate_score(question)}"
-                    if key == 'Correct'
-                    else f"0/{self.calculate_score(question)}"
-                )
-                print(f"  - Q{question} ({score})")
-
-        final_score = self.calculate_final_score()
-        print(f"FINAL SCORE: {final_score}/100")
 
 
 class M12Marker(ExamMarkerBase):
@@ -148,40 +148,72 @@ class M12Marker(ExamMarkerBase):
         self.check_submission(submission)
         return self.summary
 
-    def calculate_score(self, question_number):
-        for question_range, score in self.QUESTION_SCORES.items():
-            if question_number in question_range:
-                return score
-        return 0
 
-    def calculate_final_score(self):
-        return sum(self.calculate_score(q) for q in self.summary['Correct'])
+class M31Marker(ExamMarkerBase):
+    QUESTION_SCORES = {
+        range(1, 14): 5,
+        range(14, 15): 15,
+        range(15, 16): 10,
+    }
 
-    def display_summary(self, summary):
-        print(f"{self.exam_name} - EXAM SUMMARY")
+    def __init__(self):
+        super().__init__()
+        self.exam_name = "M3.1"
 
-        for key, value in summary.items():
-            print(f"{key}: {len(value)}")
-            for question in value:
-                score = (
-                    f"{self.calculate_score(question)}/{self.calculate_score(question)}"
-                    if key == 'Correct'
-                    else f"0/{self.calculate_score(question)}"
-                )
-                print(f"  - Q{question} ({score})")
+    def get_solutions(self):
+        return {
+            "1": "D",
+            "2": "A",
+            "3": "A",
+            "4": "B",
+            "5": "B",
+            "6": "A",
+            "7": "C",
+            "8": "A",
+            "9": "D",
+            "10": "df['f[dTotalPay']>df['TotalPay'].mean()]",
+            "11": "C",
+            "12": "A",
+            "13": "C",
+            "14": "df['JobTitle'].value_counts().head()",
+            "15": """
+                    df_top5 = df['JobTitle'].value_counts().head().index
+                    pd.pivot_table(data=df[df['JobTitle'].isin(df_top5)],
+                                index=['JobTitle'],
+                                columns=['Year'],
+                                values=['BasePay', 'OvertimePay', 'TotalPay'])
+                    """
+        }
 
-        final_score = self.calculate_final_score()
-        print(f"FINAL SCORE: {final_score}/100")
+    def check_submission(self, submission, is_expression=False, start_index=1):
+        for i, answer in enumerate(submission, start_index):
+            solution = self.solutions.get(str(i))
+            correct = None
+
+            if answer:
+                if is_expression:
+                    correct = Utils.check_sql(answer, solution, i, self.conn)
+                else:
+                    correct = answer == solution
+
+            self.update_summary(i, correct)
+
+    def mark_submission(self, submission):
+        self.check_submission(
+            submission[:13], is_expression=False, start_index=1)
+        self.check_submission(
+            submission[13:], is_expression=False, start_index=14)
+        return self.summary
 
 
 if __name__ == '__main__':
     import requests
-    email = "hodominhquan.self@gmail.com"
+    email = "quan.do@coderschool.vn"
     response = requests.get(
         f"https://cspyclient.up.railway.app/submission/{email}")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M12Marker()
+    marker = M31Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
