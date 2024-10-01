@@ -177,12 +177,14 @@ class M31Marker(ExamMarkerBase):
             "13": "C",
             "14": "df['JobTitle'].value_counts().head()",
             "15": """
-                    df_top5 = df['JobTitle'].value_counts().head().index
-                    pd.pivot_table(data=df[df['JobTitle'].isin(df_top5)],
-                                index=['JobTitle'],
-                                columns=['Year'],
-                                values=['BasePay', 'OvertimePay', 'TotalPay'])
-                    """
+                df_top5 = df['JobTitle'].value_counts().head().index
+                pd.pivot_table(
+                    data=df[df['JobTitle'].isin(df_top5)],
+                    index=['JobTitle'],
+                    columns=['Year'],
+                    values=['BasePay', 'OvertimePay', 'TotalPay']
+                )
+                """
         }
 
     def check_submission(self, submission, is_expression=False, start_index=1):
