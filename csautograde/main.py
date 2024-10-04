@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from utils import Utils
+from .utils import Utils
 
 
 class ExamMarkerBase(ABC):
