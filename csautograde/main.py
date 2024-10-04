@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from .utils import Utils
+from utils import Utils
 
 
 class ExamMarkerBase(ABC):
@@ -102,10 +102,13 @@ class M11Marker(ExamMarkerBase):
 
 class M12Marker(ExamMarkerBase):
     QUESTION_SCORES = {
-        range(1, 4): 5,
-        range(4, 7): 10,
-        range(7, 11): 5,
-        range(11, 16): 10,
+        range(1, 6): 5,
+        range(6, 7): 10,
+        range(7, 8): 5,
+        range(8, 10): 10,
+        range(10, 13): 5,
+        range(13, 15): 10,
+        range(15, 16): 5
     }
 
     def __init__(self):
@@ -210,12 +213,14 @@ class M31Marker(ExamMarkerBase):
 
 if __name__ == '__main__':
     import requests
-    email = "quan.do@coderschool.vn"
+    email = "van.nguyen@coderschool.vn"
     response = requests.get(
         f"https://cspyclient.up.railway.app/submission/{email}")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M31Marker()
+    marker = M12Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
+
+    print(marker.summary)
