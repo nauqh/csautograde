@@ -155,8 +155,8 @@ class M12Marker(ExamMarkerBase):
 
 class M31Marker(ExamMarkerBase):
     QUESTION_SCORES = {
-        range(1, 14): 5,
-        range(14, 15): 15,
+        range(1, 13): 5,
+        range(13, 15): 15,
         range(15, 16): 10,
     }
 
@@ -180,10 +180,10 @@ class M31Marker(ExamMarkerBase):
             "7": "C",
             "8": "A",
             "9": "D",
-            "10": "df['f[dTotalPay']>df['TotalPay'].mean()]",
+            "10": "C",
             "11": "C",
             "12": "A",
-            "13": "C",
+            "13": "df['df[dTotalPay']>df['TotalPay'].mean()]",
             "14": "df['JobTitle'].value_counts().head()",
             "15": """
                 # df['JobTitle'].value_counts().head().index 

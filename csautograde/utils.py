@@ -109,7 +109,7 @@ class Utils():
             return 'INVALID'
         try:
             result = eval(textwrap.dedent(solution), global_dict)
-            result_sub = eval(textwrap.dedent(submission), global_dict)
+            result_sub = eval(submission, global_dict)
             if cls.is_equal(result, result_sub):
                 return True
             return False
