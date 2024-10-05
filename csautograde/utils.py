@@ -2,6 +2,7 @@ import pandas as pd
 from functools import partial
 import pandas as pd
 import numpy as np
+import textwrap
 
 
 class Utils():
@@ -102,20 +103,18 @@ class Utils():
             return False
 
     @classmethod
-    def check_expression(cls, submission, solution, global_dict):
+    def check_expression(cls, submission, solution, q_index, global_dict):
         if (not isinstance(submission, str)):
             cls.printt("Your expression answer must be a string")
             return 'INVALID'
-
         try:
-            result = eval(solution, global_dict)
-            result_sub = eval(submission, global_dict)
-            assert cls.is_equal(result, result_sub)
-            cls.printt('You passed! Good job!')
-            return True
+            result = eval(textwrap.dedent(solution), global_dict)
+            result_sub = eval(textwrap.dedent(submission), global_dict)
+            if cls.is_equal(result, result_sub):
+                return True
+            return False
         except Exception as e:
-            cls.printt(e)
-            cls.printt('Your solution is not correct, try again')
+            cls.printt(f'Something went wrong for question {q_index}: {e}')
             return False
 
     @classmethod

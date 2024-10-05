@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import requests
 import sqlite3
 from .utils import Utils
+import pandas as pd
 
 
 class ExamMarkerBase(ABC):
@@ -162,6 +163,11 @@ class M31Marker(ExamMarkerBase):
     def __init__(self):
         super().__init__()
         self.exam_name = "M3.1"
+        df = pd.read_csv(
+            'https://raw.githubusercontent.com/anhquan0412/dataset/main/Salaries.csv')
+        df.drop(columns=['Notes', 'Status', 'Agency'], inplace=True)
+        df['JobTitle'] = df['JobTitle'].str.title()
+        self.df = df
 
     def get_solutions(self):
         return {
@@ -180,9 +186,9 @@ class M31Marker(ExamMarkerBase):
             "13": "C",
             "14": "df['JobTitle'].value_counts().head()",
             "15": """
-                df_top5 = df['JobTitle'].value_counts().head().index
+                # df['JobTitle'].value_counts().head().index 
                 pd.pivot_table(
-                    data=df[df['JobTitle'].isin(df_top5)],
+                    data=df[df['JobTitle'].isin(df['JobTitle'].value_counts().head().index)],
                     index=['JobTitle'],
                     columns=['Year'],
                     values=['BasePay', 'OvertimePay', 'TotalPay']
@@ -197,7 +203,10 @@ class M31Marker(ExamMarkerBase):
 
             if answer:
                 if is_expression:
-                    correct = Utils.check_sql(answer, solution, i, self.conn)
+                    global_dict = globals().copy()
+                    global_dict['df'] = self.df
+                    correct = Utils.check_expression(
+                        answer, solution, i, global_dict)
                 else:
                     correct = answer == solution
 
@@ -207,19 +216,19 @@ class M31Marker(ExamMarkerBase):
         self.check_submission(
             submission[:13], is_expression=False, start_index=1)
         self.check_submission(
-            submission[13:], is_expression=False, start_index=14)
+            submission[13:], is_expression=True, start_index=14)
         return self.summary
 
 
 if __name__ == '__main__':
     import requests
-    email = "van.nguyen@coderschool.vn"
+    email = "hodominhquan.self@gmail.com"
     response = requests.get(
         f"https://cspyclient.up.railway.app/submission/{email}")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M12Marker()
+    marker = M31Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
 
