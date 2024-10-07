@@ -118,27 +118,32 @@ class Utils():
             return False
 
     @classmethod
-    def check_function(cls, submission, solution, global_dict, test_cases=None):
+    def check_function(cls, submission, solution, global_dict, q_index, test_cases=None):
         if not test_cases:
             cls.printt("No test cases input")
             return 'INVALID'
 
         try:
             score = 0
+            solution = textwrap.dedent(solution)
             exec(submission, global_dict)
             exec(solution, global_dict)
             func_name_sub = submission.split('(')[0][4:]
-            func_name_sol = solution.split('(')[0][4:]
+            func_name_sol = solution.split('(')[0][4:].strip()
             for tc in test_cases:
                 result_sub = global_dict[func_name_sub](*tc)
                 result_sol = global_dict[func_name_sol](*tc)
                 if cls.is_equal(result_sub, result_sol):
                     score += 1
-            cls.printt(f'You have passed {score}/{len(test_cases)} test cases')
+            # cls.printt(f'You have passed {score}/{len(test_cases)} test cases')
+            if score == len(test_cases):
+                return True
+            else:
+                return False
             return score/len(test_cases)
         except Exception as e:
-            cls.printt('Your solution is not correct, try again')
-            return 0
+            cls.printt(f'Something went wrong for question {q_index}: {e}')
+            return False
 
     @classmethod
     def check_sql(cls, answer, solution, q_index, connection=None):
