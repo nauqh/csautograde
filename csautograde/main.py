@@ -237,14 +237,14 @@ class M21Marker(ExamMarkerBase):
 
     def get_solutions(self):
         return {
-            "1": "B",
+            "1": "A",
             "2": "B",
-            "3": "D",
-            "4": ["A", "B"],
-            "5": "D",
-            "6": ["B", "D"],
-            "7": "C",
-            "8": "B",
+            "3": ["c", "e"],
+            "4": "B",
+            "5": "E",
+            "6": ["A", "C"],
+            "7": ["C", "D"],
+            "8": "C",
             "9": """
         def count_min(my_list):
             return my_list.count(min(my_list))
@@ -302,6 +302,7 @@ class M21Marker(ExamMarkerBase):
                         answer, solution, globals(), i, tests)
                 else:
                     if isinstance(solution, list):
+                        answer = answer.split(",")
                         if set(answer) == set(solution):
                             correct = True
                         elif set(answer) & set(solution):
