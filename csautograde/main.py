@@ -302,10 +302,14 @@ class M21Marker(ExamMarkerBase):
                         answer, solution, globals(), i, tests)
                 else:
                     if isinstance(solution, list):
-                        correct = answer in solution
+                        if set(answer) == set(solution):
+                            correct = True
+                        elif set(answer) & set(solution):
+                            correct = 'Partial'
+                        else:
+                            correct = False
                     else:
                         correct = answer == solution
-
             self.update_summary(i, correct)
 
     def mark_submission(self, submission):
