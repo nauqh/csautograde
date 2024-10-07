@@ -48,7 +48,15 @@ class ExamMarkerBase(ABC):
         return 0
 
     def calculate_final_score(self):
-        return sum(self.calculate_score(q) for q in self.summary['Correct'])
+        final_score = 0
+        for key, value in self.summary.items():
+            for question in value:
+                score = self.calculate_score(question)
+                if key == 'Correct':
+                    final_score += score
+                elif key == 'Partial':
+                    final_score += score / 2
+        return int(final_score)
 
     def display_summary(self, summary):
         print(f"{self.exam_name} - EXAM SUMMARY")
@@ -59,6 +67,8 @@ class ExamMarkerBase(ABC):
                 score = (
                     f"{self.calculate_score(question)}/{self.calculate_score(question)}"
                     if key == 'Correct'
+                    else f"{int(self.calculate_score(question)/2)}/{self.calculate_score(question)}"
+                    if key == 'Partial'
                     else f"0/{self.calculate_score(question)}"
                 )
                 print(f"  - Q{question} ({score})")
@@ -225,8 +235,8 @@ class M31Marker(ExamMarkerBase):
 
 class M21Marker(ExamMarkerBase):
     QUESTION_SCORES = {
-        range(1, 7): 4,
-        range(7, 13): 12,
+        range(1, 9): 4,
+        range(9, 13): 12,
         range(13, 15): 10,
     }
 
@@ -315,7 +325,7 @@ class M21Marker(ExamMarkerBase):
 
     def mark_submission(self, submission):
         self.check_submission(
-            submission[:8], is_function=True, start_index=1)
+            submission[:8], is_function=False, start_index=1)
         self.check_submission(
             submission[8:], is_function=True, start_index=9)
         return self.summary

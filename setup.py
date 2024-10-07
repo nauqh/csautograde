@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='csautograde',
-    version='0.2.0',
+    version='0.2.5',
     description='An internal tool for exam autograding',
     author='Obiwan',
     author_email='quan.do@coderschool.vn',
