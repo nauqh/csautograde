@@ -12,10 +12,6 @@ class Utils():
     DEBUG = True
 
     @classmethod
-    def remove_command_line(cls, block_code):
-        return '\n'.join([c for c in block_code.split('\n') if not c.startswith('!')]).strip()
-
-    @classmethod
     def printt(cls, msg):
         if cls.DEBUG:
             print(msg)
