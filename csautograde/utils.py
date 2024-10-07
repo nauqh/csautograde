@@ -118,8 +118,8 @@ class Utils():
             return False
 
     @classmethod
-    def check_function(cls, submission, solution, global_dict, q_index, test_cases=None):
-        if not test_cases:
+    def check_function(cls, submission, solution, global_dict, q_index, tests=None):
+        if not tests:
             cls.printt("No test cases input")
             return 'INVALID'
 
@@ -131,13 +131,13 @@ class Utils():
             func_name_sub = submission.split('(')[0][4:]
             func_name_sol = solution.split('(')[0][4:].strip()
 
-            for tc in test_cases:
-                result_sub = global_dict[func_name_sub](*tc)
-                result_sol = global_dict[func_name_sol](*tc)
+            for test in tests:
+                result_sub = global_dict[func_name_sub](*test)
+                result_sol = global_dict[func_name_sol](*test)
                 if cls.is_equal(result_sub, result_sol):
                     score += 1
 
-            if score == len(test_cases):
+            if score == len(tests):
                 return True
             elif score == 0:
                 return False
