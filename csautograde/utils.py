@@ -130,17 +130,19 @@ class Utils():
             exec(solution, global_dict)
             func_name_sub = submission.split('(')[0][4:]
             func_name_sol = solution.split('(')[0][4:].strip()
+
             for tc in test_cases:
                 result_sub = global_dict[func_name_sub](*tc)
                 result_sol = global_dict[func_name_sol](*tc)
                 if cls.is_equal(result_sub, result_sol):
                     score += 1
-            # cls.printt(f'You have passed {score}/{len(test_cases)} test cases')
+
             if score == len(test_cases):
                 return True
-            else:
+            elif score == 0:
                 return False
-            return score/len(test_cases)
+            else:
+                return 'Partial'
         except Exception as e:
             cls.printt(f'Something went wrong for question {q_index}: {e}')
             return False

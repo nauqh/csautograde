@@ -34,10 +34,12 @@ class ExamMarkerBase(ABC):
     def update_summary(self, question_number, correct):
         if correct is None:
             self.summary['Not submitted'].append(question_number)
-        elif correct:
+        elif correct == True:
             self.summary['Correct'].append(question_number)
-        else:
+        elif correct == False:
             self.summary['Incorrect'].append(question_number)
+        else:
+            self.summary['Partial'].append(question_number)
 
     def calculate_score(self, question_number):
         for question_range, score in self.QUESTION_SCORES.items():
