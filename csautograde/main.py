@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from .utils import Utils
+from utils import Utils
 import pandas as pd
 
 
@@ -183,7 +183,7 @@ class M31Marker(ExamMarkerBase):
             "10": "C",
             "11": "C",
             "12": "A",
-            "13": "df['df[dTotalPay']>df['TotalPay'].mean()]",
+            "13": "df[df['TotalPay']>df['TotalPay'].mean()]",
             "14": "df['JobTitle'].value_counts().head()",
             "15": """
                 # df['JobTitle'].value_counts().head().index 
@@ -196,7 +196,7 @@ class M31Marker(ExamMarkerBase):
                 """
         }
 
-    def check_submission(self, submission, is_expression=False, start_index=1):
+    def check_submission(self, submission, start_index, is_expression=False, ):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
@@ -214,9 +214,9 @@ class M31Marker(ExamMarkerBase):
 
     def mark_submission(self, submission):
         self.check_submission(
-            submission[:13], is_expression=False, start_index=1)
+            submission[:12], is_expression=False, start_index=1)
         self.check_submission(
-            submission[13:], is_expression=True, start_index=14)
+            submission[12:], is_expression=True, start_index=13)
         return self.summary
 
 
@@ -231,5 +231,3 @@ if __name__ == '__main__':
     marker = M31Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
-
-    print(marker.summary)
