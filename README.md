@@ -42,7 +42,7 @@ For questions requiring students to submit a Python function, the system process
 ### Main Module
 The autograding system is structured around an abstract base class `ExamMarkerBase` and four specialized child classes: `M11Marker`, `M12Marker`, `M21Marker`, and `M31Marker`. Each child class implements specific logic for grading distinct exams (M1.1, M1.2, M2.1, and M3.1), including custom scoring, solutions, and marking rules. The base class provides common functionality for managing student submissions, updating summaries, and calculating scores. This design promotes code reuse while allowing for specific customizations based on the requirements of each exam.
 
-<img width="500" src="img/uml.png">
+![](img/uml.png)
 
 ### Utils Module
 The `Utils` class plays an essential role in evaluating coding expressions .e.g SQL queries, Python functions, Pandas expressions. It provides helper functions like `check_sql()` for SQL validation and `check_expression()` or `check_function()` for validating code expressions and function outputs. These functions are integrated into the marking process, particularly for SQL- and function-based questions. For detailed documentation, please refer to the `utils.py` module in the codebase.
