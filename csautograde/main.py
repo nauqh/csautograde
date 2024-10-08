@@ -337,6 +337,47 @@ class M21Marker(ExamMarkerBase):
         return self.summary
 
 
+# NOTE: Functions for API
+def calculate_score(question_number: int, QUESTION_SCORES: dict) -> int:
+    for question_range, score in QUESTION_SCORES.items():
+        if question_number in question_range:
+            return score
+    return 0
+
+
+def calculate_final_score(summary, QUESTION_SCORES: dict) -> int:
+    final_score = 0
+    for key, value in summary.items():
+        for question in value:
+            score = calculate_score(question, QUESTION_SCORES)
+            if key == 'Correct':
+                final_score += score
+            elif key == 'Partial':
+                final_score += score / 2
+    return int(final_score)
+
+
+def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
+    result = f"{exam_name} - EXAM SUMMARY\n"
+
+    for key, value in summary.items():
+        result += f"{key}: {len(value)}\n"
+        for question in value:
+            score = (
+                f"{calculate_score(question, rubrics)}/{calculate_score(question, rubrics)}"
+                if key == 'Correct'
+                else f"{int(calculate_score(question, rubrics)/2)}/{calculate_score(question, rubrics)}"
+                if key == 'Partial'
+                else f"0/{calculate_score(question, rubrics)}"
+            )
+            result += f"  - Q{question} ({score})\n"
+
+    final_score = calculate_final_score(summary, rubrics)
+    result += f"FINAL SCORE: {final_score}/100\n"
+
+    return result
+
+
 if __name__ == '__main__':
     import requests
     email = "quan.do@coderschool.vn"
