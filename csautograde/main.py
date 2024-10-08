@@ -7,11 +7,21 @@ import json
 
 
 class ExamMarkerBase(ABC):
+    """
+    Abstract base class for ExamMarker classes
+
+    Subclasses must implement get_solutions() and mark_submission() method
+
+    Attributes:
+        solutions (dict): A dictionary mapping question numbers to solutions
+        summary (dict): A summary of student's performance
+    """
+
     def __init__(self):
         self.solutions = self.get_solutions()
         self.summary = self.initialize_summary()
 
-    def initialize_summary(self):
+    def initialize_summary(self) -> dict:
         return {
             'Not submitted': [],
             'Incorrect': [],
@@ -20,18 +30,14 @@ class ExamMarkerBase(ABC):
         }
 
     @abstractmethod
-    def get_solutions(self):
+    def get_solutions(self) -> dict:
         pass
 
     @abstractmethod
-    def mark_submission(self, submission):
+    def mark_submission(self, submission: list):
         pass
 
-    @abstractmethod
-    def display_summary(self, submission):
-        pass
-
-    def update_summary(self, question_number, correct):
+    def update_summary(self, question_number: int, correct: bool | None | str):
         if correct is None:
             self.summary['Not submitted'].append(question_number)
         elif correct == True:
@@ -41,13 +47,13 @@ class ExamMarkerBase(ABC):
         else:
             self.summary['Partial'].append(question_number)
 
-    def calculate_score(self, question_number):
+    def calculate_score(self, question_number: int):
         for question_range, score in self.QUESTION_SCORES.items():
             if question_number in question_range:
                 return score
         return 0
 
-    def calculate_final_score(self):
+    def calculate_final_score(self) -> int:
         final_score = 0
         for key, value in self.summary.items():
             for question in value:
@@ -58,7 +64,7 @@ class ExamMarkerBase(ABC):
                     final_score += score / 2
         return int(final_score)
 
-    def display_summary(self, summary):
+    def display_summary(self, summary: dict):
         print(f"{self.exam_name} - EXAM SUMMARY")
 
         for key, value in summary.items():
@@ -90,12 +96,12 @@ class M11Marker(ExamMarkerBase):
         self.exam_name = "M1.1"
         self.conn = sqlite3.connect("northwind.db")
 
-    def get_solutions(self):
+    def get_solutions(self) -> dict:
         response = requests.get(
             'https://raw.githubusercontent.com/nauqh/csautograde/refs/heads/master/solutions/M11.json')
         return response.json()
 
-    def check_submission(self, submission, is_sql=False, start_index=1):
+    def check_submission(self, submission: list, is_sql: bool = False, start_index=1):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
@@ -108,7 +114,7 @@ class M11Marker(ExamMarkerBase):
 
             self.update_summary(i, correct)
 
-    def mark_submission(self, submission):
+    def mark_submission(self, submission: list) -> dict:
         self.check_submission(submission[:5], is_sql=False, start_index=1)
         self.check_submission(submission[5:], is_sql=True, start_index=6)
         return self.summary
@@ -129,7 +135,7 @@ class M12Marker(ExamMarkerBase):
         super().__init__()
         self.exam_name = "M1.2"
 
-    def get_solutions(self):
+    def get_solutions(self) -> dict:
         return {
             "1": "B",
             "2": "B",
@@ -148,7 +154,7 @@ class M12Marker(ExamMarkerBase):
             "15": "B"
         }
 
-    def check_submission(self, submission, start_index=1):
+    def check_submission(self, submission: list, start_index=1):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
@@ -161,7 +167,7 @@ class M12Marker(ExamMarkerBase):
 
             self.update_summary(i, correct)
 
-    def mark_submission(self, submission):
+    def mark_submission(self, submission) -> dict:
         self.check_submission(submission)
         return self.summary
 
@@ -182,7 +188,7 @@ class M31Marker(ExamMarkerBase):
         df['JobTitle'] = df['JobTitle'].str.title()
         self.df = df
 
-    def get_solutions(self):
+    def get_solutions(self) -> dict:
         return {
             "1": "D",
             "2": "A",
@@ -209,7 +215,7 @@ class M31Marker(ExamMarkerBase):
                 """
         }
 
-    def check_submission(self, submission, start_index, is_expression=False):
+    def check_submission(self, submission: list, start_index: int, is_expression: bool = False):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
@@ -225,7 +231,7 @@ class M31Marker(ExamMarkerBase):
 
             self.update_summary(i, correct)
 
-    def mark_submission(self, submission):
+    def mark_submission(self, submission: list) -> dict:
         self.check_submission(
             submission[:12], is_expression=False, start_index=1)
         self.check_submission(
@@ -245,7 +251,7 @@ class M21Marker(ExamMarkerBase):
         self.exam_name = "M2.1"
         self.test_cases = self.get_test_cases()
 
-    def get_solutions(self):
+    def get_solutions(self) -> dict:
         return {
             "1": "A",
             "2": "B",
@@ -295,12 +301,12 @@ class M21Marker(ExamMarkerBase):
     """
         }
 
-    def get_test_cases(self):
+    def get_test_cases(self) -> dict:
         with open("solutions/M21_test_cases.json", "r") as f:
             test_cases = json.load(f)
         return test_cases
 
-    def check_submission(self, submission, start_index, is_function=False):
+    def check_submission(self, submission: list, start_index: int, is_function: bool = False):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             tests = self.test_cases.get(str(i))
@@ -323,7 +329,7 @@ class M21Marker(ExamMarkerBase):
                         correct = answer == solution
             self.update_summary(i, correct)
 
-    def mark_submission(self, submission):
+    def mark_submission(self, submission: list) -> dict:
         self.check_submission(
             submission[:8], is_function=False, start_index=1)
         self.check_submission(

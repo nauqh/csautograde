@@ -26,6 +26,10 @@ The system grades learner exams by performing the following steps:
 
 4. Generate report based on marking outcome
 
+## Structure
+
+<img width="500" src="img/uml.png">
+
 ## How to grade exam
 1. Access the system via [Google Colab](https://colab.research.google.com/drive/1oaoiXxOZad97zGUsefFX9PAZ7kKg1G24?usp=sharing)
    - You will be asked to authorise access to your google drive, please just allow full access
