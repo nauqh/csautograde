@@ -31,10 +31,10 @@ def root():
     return {"message": "Root endpoint"}
 
 
-@app.get("/test")
-def test_endpoint(email: str, exam):
+@app.get("/autograde")
+def test_endpoint(email: str, exam: str):
     response = requests.get(
-        f"https://cspyclient.up.railway.app/submission/{email}")
+        f"https://cspyclient.up.railway.app/submission?email={email}&exam={exam}")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
