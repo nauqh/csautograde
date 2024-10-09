@@ -380,12 +380,12 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "quan.do@coderschool.vn"
+    email = "huongtrang2798@gmail.com"
     response = requests.get(
-        f"https://cspyclient.up.railway.app/submission/{email}")
+        f"https://cspyexamclient.up.railway.app/submission?email={email}&exam=M11")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M21Marker()
+    marker = M11Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
