@@ -15,7 +15,7 @@
     "14": "SELECT DISTINCT c.CompanyName FROM Customers c JOIN Orders o on c.CustomerID = o.CustomerID JOIN \"Order Details\" od on o.OrderId = od.OrderID JOIN Products p on od.ProductID = p.ProductID WHERE p.ProductName = 'Tofu'",
     "15": "SELECT c.CustomerID, c.CompanyName FROM Customers c LEFT JOIN  Orders o on c.CustomerID = o.CustomerID WHERE o.OrderID IS NULL",
     "16": "SELECT s.CompanyName FROM Suppliers s JOIN Products p ON s.SupplierID = p.SupplierID GROUP BY s.CompanyName HAVING COUNT(p.ProductID) = 1",
-    "17": "SELECT DISTINCT e.EmployeeID, e.LastName, e.FirstName FROM Employees e JOIN Orders o ON e.EmployeeID = o.EmployeeID JOIN Customers c ON c.CustomerID = o.CustomerID WHERE e.City = c.City ORDER BY e.EmployeeID",
+    "17": "SELECT DISTINCT e.EmployeeID, e.FirstName, e.LastName FROM Employees e JOIN Orders o ON e.EmployeeID = o.EmployeeID JOIN Customers c ON c.CustomerID = o.CustomerID WHERE e.City = c.City ORDER BY e.EmployeeID",
     "18": "SELECT p.ProductName, SUM(o.Quantity) as TotalQuantity FROM Products p JOIN \"Order Details\" o ON o.ProductID = p.ProductID GROUP BY p.ProductID ORDER BY TotalQuantity DESC LIMIT 5",
     "19": "SELECT c.Country, COUNT(o.OrderID) as 'Total Orders', COUNT(DISTINCT c.CustomerID) as 'Total Customers' FROM Customers c JOIN Orders o ON c.CustomerID = o.CustomerID GROUP BY c.Country ORDER BY \"Total Orders\" DESC, \"Total Customers\" ASC",
     "20": "SELECT c.CategoryName, ROUND(AVG(o.UnitPrice*o.Quantity), 4) as 'AVG Order Value' FROM Categories c JOIN Products p ON c.CategoryID = p.CategoryID JOIN \"Order Details\" o ON o.ProductID = p.ProductID GROUP BY c.CategoryName ORDER BY \"AVG Order Value\" DESC"
