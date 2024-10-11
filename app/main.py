@@ -90,9 +90,15 @@ MARKER_CLASSES = {
 
 
 @app.get("/autograde")
-def test_endpoint(email: str, exam: str):
+def get_autograde(email: str, exam: str):
     response = requests.get(
         f"https://cspyexamclient.up.railway.app/submission?email={email}&exam={exam}")
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.json()['detail']
+        )
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
