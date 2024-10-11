@@ -111,4 +111,7 @@ def get_autograde(email: str, exam: str):
 
     marker = MarkerClass()
     marker.mark_submission(s)
-    return create_summary(marker.exam_name, marker.summary, marker.QUESTION_SCORES)
+    return {
+        'submission': s,
+        'summary': create_summary(marker.exam_name, marker.summary, marker.QUESTION_SCORES)
+    }
