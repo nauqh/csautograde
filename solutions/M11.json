@@ -10,7 +10,7 @@
     "9": "SELECT Country, COUNT(SupplierID) as '#Suppliers' FROM Suppliers GROUP BY Country ORDER BY \"#Suppliers\" LIMIT 5",
     "10": "SELECT CategoryName, COUNT(ProductID) as '#Products' FROM Products p join Categories c on p.CategoryID = c.CategoryID GROUP BY CategoryName ORDER BY \"#Products\" DESC",
     "11": "SELECT p.ProductName, ROUND(SUM(o.UnitPrice*o.Quantity),1) as 'Total Revenue' FROM \"Order Details\" o join Products p on o.ProductID = p.ProductID GROUP BY p.ProductName ORDER BY \"Total Revenue\" DESC LIMIT 5",
-    "12": "SELECT e.FirstName, e.LastName, SUM(od.Quantity) as 'Total sales' FROM Employees e JOIN Orders o on e.EmployeeID = o.EmployeeID JOIN \"Order Details\" od on od.OrderID = o.OrderID GROUP BY e.EmployeeID ORDER BY \"Total sales\" DESC",
+    "12": "SELECT e.FirstName, e.LastName, SUM(od.Quantity) as '#Products' FROM Employees e JOIN Orders o on e.EmployeeID = o.EmployeeID JOIN \"Order Details\" od on od.OrderID = o.OrderID GROUP BY e.EmployeeID ORDER BY '#Products' DESC",
     "13": "SELECT STRFTIME('%Y', OrderDate) AS Year, COUNT(OrderID) as '#Orders', ShipRegion FROM Orders WHERE ShipRegion = 'Western Europe' GROUP BY \"Year\"",
     "14": "SELECT DISTINCT c.CompanyName FROM Customers c JOIN Orders o on c.CustomerID = o.CustomerID JOIN \"Order Details\" od on o.OrderId = od.OrderID JOIN Products p on od.ProductID = p.ProductID WHERE p.ProductName = 'Tofu'",
     "15": "SELECT c.CustomerID, c.CompanyName FROM Customers c LEFT JOIN  Orders o on c.CustomerID = o.CustomerID WHERE o.OrderID IS NULL",
