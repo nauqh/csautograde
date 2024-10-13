@@ -15,9 +15,6 @@ router = APIRouter(
 async def add_submission(data: Submission, db: Session = Depends(get_db)):
     """Add a new submission to the database.
 
-    Args:
-        data: The submission data.
-
     Returns:
         A message indicating the submission was added.
     """
@@ -32,15 +29,8 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
 async def get_submission(email: str, exam: str, db: Session = Depends(get_db)):
     """Get a submission by email and exam.
 
-    Args:
-        email: The email of the submission.
-        exam: The exam id of the submission.
-
     Returns:
         The submission.
-
-    Raises:
-        HTTPException: If the email or exam does not exist.
     """
     email_exists = db.query(models.Submission).filter(
         models.Submission.email == email).first()
