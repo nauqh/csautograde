@@ -1,11 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
 import requests
 
 # Database
 from . import models
-from .database import engine
+from sqlalchemy.orm import Session
+from .database import engine, get_db
+
+from .schemas import Submission
 
 # Routers
 from .routers import submission, exam
@@ -41,6 +44,20 @@ MARKER_CLASSES = {
     "M21": M21Marker,
     "M31": M31Marker
 }
+
+
+@app.post("/submissions", status_code=status.HTTP_201_CREATED)
+async def add_submission(data: Submission, db: Session = Depends(get_db)):
+    """Add a new submission to the database.
+
+    Returns:
+        A message indicating the submission was added.
+    """
+    submission = models.Submission(**data.model_dump())
+    db.add(submission)
+    db.commit()
+
+    return f"Added submission for {submission.email}"
 
 
 @app.get("/autograde")
