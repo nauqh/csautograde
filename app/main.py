@@ -46,7 +46,7 @@ MARKER_CLASSES = {
 }
 
 
-@app.get("/", response_model=SubmissionResponse)
+@app.get("/submissions", response_model=SubmissionResponse)
 async def get_submission(email: str, exam: str, db: Session = Depends(get_db)):
     """Get a submission by email and exam.
 
@@ -77,7 +77,7 @@ async def get_submission(email: str, exam: str, db: Session = Depends(get_db)):
     return assignment
 
 
-@app.post("/", status_code=status.HTTP_201_CREATED)
+@app.post("/submissions", status_code=status.HTTP_201_CREATED)
 async def add_submission(data: Submission, db: Session = Depends(get_db)):
     """Add a new submission to the database.
 
