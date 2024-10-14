@@ -15,7 +15,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title='CS Exam Python Client',
     summary="Client for learner submissions",
-    version='0.0.2'
+    version='0.0.4'
 )
 
 app.add_middleware(
