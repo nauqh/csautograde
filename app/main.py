@@ -1,14 +1,11 @@
-from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
 import requests
 
 # Database
 from . import models
-from sqlalchemy.orm import Session
-from .database import engine, get_db
-
-from .schemas import Submission
+from .database import engine
 
 # Routers
 from .routers import submission, exam
@@ -18,7 +15,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title='CS Exam Python Client',
     summary="Client for learner submissions",
-    version='0.0.4'
+    version='0.0.5'
 )
 
 app.add_middleware(
@@ -44,20 +41,6 @@ MARKER_CLASSES = {
     "M21": M21Marker,
     "M31": M31Marker
 }
-
-
-@app.post("/submissions", status_code=status.HTTP_201_CREATED)
-async def add_submission(data: Submission, db: Session = Depends(get_db)):
-    """Add a new submission to the database.
-
-    Returns:
-        A message indicating the submission was added.
-    """
-    submission = models.Submission(**data.model_dump())
-    db.add(submission)
-    db.commit()
-
-    return f"Added submission for {submission.email}"
 
 
 @app.get("/autograde")
