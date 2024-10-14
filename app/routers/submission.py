@@ -11,18 +11,18 @@ router = APIRouter(
 )
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def add_submission(data: Submission, db: Session = Depends(get_db)):
-    """Add a new submission to the database.
+# @router.post("/", status_code=status.HTTP_201_CREATED)
+# async def add_submission(data: Submission, db: Session = Depends(get_db)):
+#     """Add a new submission to the database.
 
-    Returns:
-        A message indicating the submission was added.
-    """
-    submission = models.Submission(**data.model_dump())
-    db.add(submission)
-    db.commit()
+#     Returns:
+#         A message indicating the submission was added.
+#     """
+#     submission = models.Submission(**data.model_dump())
+#     db.add(submission)
+#     db.commit()
 
-    return f"Added submission for {submission.email}"
+#     return f"Added submission for {submission.email}"
 
 
 @router.get("/", response_model=SubmissionResponse)
