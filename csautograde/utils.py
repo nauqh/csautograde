@@ -132,24 +132,6 @@ class Utils():
                 result_sol = global_dict[func_name_sol](*test)
                 if cls.is_equal(result_sub, result_sol):
                     score += 1
-                if score != len(tests):
-                    first_fail_test = tests[score]
-                    try:
-                        result_sub = global_dict[func_name_sub](
-                            *first_fail_test)
-                        if result_sub != global_dict[func_name_sol](*first_fail_test):
-                            cls.printt(
-                                f'First fail test case: {first_fail_test}')
-                            cls.printt(
-                                f'Expected output: {global_dict[func_name_sol](*first_fail_test)}')
-                            cls.printt(f'Your output: {result_sub}')
-                            return 'Partial'
-                    except Exception as e:
-                        cls.printt(f'First fail test case: {first_fail_test}')
-                        cls.printt(
-                            f'Expected output: {global_dict[func_name_sol](*first_fail_test)}')
-                        cls.printt(f'Error: {e}')
-                        return 'Partial'
 
             if score == len(tests):
                 return True
