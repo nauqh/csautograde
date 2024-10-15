@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from .utils import Utils
+from utils import Utils
 import pandas as pd
 import json
 
@@ -27,6 +27,7 @@ class ExamMarkerBase(ABC):
             'Incorrect': [],
             'Partial': [],
             'Correct': [],
+            'Issue': [],
         }
 
     @abstractmethod
@@ -37,13 +38,15 @@ class ExamMarkerBase(ABC):
     def mark_submission(self, submission: list):
         pass
 
-    def update_summary(self, question_number: int, correct: bool | None | str):
+    def update_summary(self, question_number: int, correct: bool | None | str, issue: str | None = None):
         if correct is None:
             self.summary['Not submitted'].append(question_number)
         elif correct == True:
             self.summary['Correct'].append(question_number)
         elif correct == False:
             self.summary['Incorrect'].append(question_number)
+            if issue:
+                self.summary['Issue'].append((question_number, issue))
         else:
             self.summary['Partial'].append(question_number)
 
@@ -70,6 +73,9 @@ class ExamMarkerBase(ABC):
         for key, value in summary.items():
             print(f"{key}: {len(value)}")
             for question in value:
+                if key == 'Issue':
+                    print(f"  - {question[1]}")
+                    continue
                 score = (
                     f"{self.calculate_score(question)}/{self.calculate_score(question)}"
                     if key == 'Correct'
@@ -262,25 +268,25 @@ class M21Marker(ExamMarkerBase):
             "7": ["C", "D"],
             "8": "C",
             "9": """
-        def count_min(my_list):
+        def count_min_sol(my_list):
             return my_list.count(min(my_list))
     """,
             "10": """
-        def calculate_range(my_tup):
+        def calculate_range_sol(my_tup):
             return max(my_tup) - min(my_tup)
     """,
             "11": """
-        def extract_email(email, get_username):
+        def extract_email_sol(email, get_username):
             return email.split('@')[0] if get_username else email.split('@')[1]
     """,
             "12": """
-        def item_calculator(item, get_weight):
+        def item_calculator_sol(item, get_weight):
             weight = item['unit_weight'] * item['number_of_units']
             cost   = item['unit_price'] * item['number_of_units']
             return weight if get_weight else cost
     """,
             "13": """
-        def heaviest_item(receipt):
+        def heaviest_item_sol(receipt):
             def item_calculator(item, get_weight):
                 weight = item['unit_weight'] * item['number_of_units']
                 cost   = item['unit_price'] * item['number_of_units']
@@ -290,7 +296,7 @@ class M21Marker(ExamMarkerBase):
             return max(weight_receipt, key=weight_receipt.get)
     """,
             "14": """
-        def priciest_item(receipt):
+        def priciest_item_sol(receipt):
             def item_calculator(item, get_weight):
                 weight = item['unit_weight'] * item['number_of_units']
                 cost   = item['unit_price'] * item['number_of_units']
@@ -311,10 +317,11 @@ class M21Marker(ExamMarkerBase):
             solution = self.solutions.get(str(i))
             tests = self.test_cases.get(str(i))
             correct = None
+            issue = None
 
             if answer:
                 if is_function:
-                    correct = Utils.check_function(
+                    correct, issue = Utils.check_function(
                         answer, solution, globals(), i, tests)
                 else:
                     if isinstance(solution, list):
@@ -327,7 +334,7 @@ class M21Marker(ExamMarkerBase):
                             correct = False
                     else:
                         correct = answer == solution
-            self.update_summary(i, correct)
+            self.update_summary(i, correct, issue)
 
     def mark_submission(self, submission: list) -> dict:
         self.check_submission(
@@ -380,12 +387,12 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "huongtrang2798@gmail.com"
+    email = "quan@test.com"
     response = requests.get(
-        f"https://cspyexamclient.up.railway.app/submission?email={email}&exam=M11")
+        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M21")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M11Marker()
+    marker = M21Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)

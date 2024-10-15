@@ -115,12 +115,7 @@ class Utils():
 
     @classmethod
     def check_function(cls, submission, solution, global_dict, q_index, tests=None):
-        if not tests:
-            cls.printt("No test cases input")
-            return 'INVALID'
-
         try:
-            score = 0
             solution = textwrap.dedent(solution)
             exec(submission, global_dict)
             exec(solution, global_dict)
@@ -130,18 +125,17 @@ class Utils():
             for test in tests:
                 result_sub = global_dict[func_name_sub](*test)
                 result_sol = global_dict[func_name_sol](*test)
-                if cls.is_equal(result_sub, result_sol):
-                    score += 1
+                if not cls.is_equal(result_sub, result_sol):
+                    cls.printt(
+                        f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}')
+                    issue = f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}'
+                    return False, issue
+            return True, None
 
-            if score == len(tests):
-                return True
-            elif score == 0:
-                return False
-            else:
-                return 'Partial'
         except Exception as e:
-            cls.printt(f'Something went wrong for question {q_index}: {e}')
-            return False
+            cls.printt(f'Q{q_index}: {e}')
+            issue = f'Q{q_index}: {e}'
+            return False, issue
 
     @classmethod
     def check_sql(cls, answer, solution, q_index, connection=None):
