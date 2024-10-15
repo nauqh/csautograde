@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 import sqlite3
-from .utils import Utils
+from utils import Utils
 import pandas as pd
 import json
 
@@ -370,6 +370,10 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
     for key, value in summary.items():
         result += f"{key}: {len(value)}\n"
         for question in value:
+            for question in value:
+                if key == 'Issue':
+                    print(f"  - {question[1]}")
+                    continue
             score = (
                 f"{calculate_score(question, rubrics)}/{calculate_score(question, rubrics)}"
                 if key == 'Correct'
