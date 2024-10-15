@@ -390,7 +390,7 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "quan@test.com"
+    email = "van.nguyen@coderschool.vn"
     response = requests.get(
         f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M21")
     submission = response.json()['answers']

@@ -126,14 +126,14 @@ class Utils():
                 result_sub = global_dict[func_name_sub](*test)
                 result_sol = global_dict[func_name_sol](*test)
                 if not cls.is_equal(result_sub, result_sol):
-                    cls.printt(
-                        f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}')
+                    # cls.printt(
+                    #     f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}')
                     issue = f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}'
                     return False, issue
             return True, None
 
         except Exception as e:
-            cls.printt(f'Q{q_index}: {e}')
+            # cls.printt(f'Q{q_index}: {e}')
             issue = f'Q{q_index}: {e}'
             return False, issue
 
