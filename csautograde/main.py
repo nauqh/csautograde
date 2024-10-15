@@ -371,7 +371,7 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
         result += f"{key}: {len(value)}\n"
         for question in value:
             if key == 'Issue':
-                # result += f"  - {question[1]}\n"
+                result += f"  - {question[1]}\n"
                 continue
             score = (
                 f"{calculate_score(question, rubrics)}/{calculate_score(question, rubrics)}"
