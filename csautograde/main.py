@@ -45,10 +45,11 @@ class ExamMarkerBase(ABC):
             self.summary['Correct'].append(question_number)
         elif correct == False:
             self.summary['Incorrect'].append(question_number)
-            if issue:
-                self.summary['Issue'].append((question_number, issue))
         else:
             self.summary['Partial'].append(question_number)
+
+        if issue:
+            self.summary['Issue'].append((question_number, issue))
 
     def calculate_score(self, question_number: int):
         for question_range, score in self.QUESTION_SCORES.items():

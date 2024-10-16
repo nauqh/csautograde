@@ -120,19 +120,30 @@ class Utils():
             exec(submission, global_dict)
             exec(solution, global_dict)
 
+            have_other_code = submission[:submission.find('def')].strip() != ""
             submission = submission[submission.find('def'):]
             func_name_sub = submission.split('(')[0][4:]
             func_name_sol = solution.split('(')[0][4:].strip()
 
+            test_passed = 0
+
             for test in tests:
                 result_sub = global_dict[func_name_sub](*test)
                 result_sol = global_dict[func_name_sol](*test)
+
                 if not cls.is_equal(result_sub, result_sol):
-                    # cls.printt(
-                    #     f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}')
                     issue = f'Q{q_index}: {test} \nExpected output: {result_sol} \nYour output: {result_sub}'
                     return False, issue
-            return True, None
+
+                test_passed += 1
+
+            if test_passed == len(tests):
+                if have_other_code:
+                    return "Partial", f"Q{q_index}: Submission is in wrong format"
+                else:
+                    return True, None
+            else:
+                return False, None
 
         except Exception as e:
             # cls.printt(f'Q{q_index}: {e}')
