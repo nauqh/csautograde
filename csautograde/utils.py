@@ -119,6 +119,8 @@ class Utils():
             solution = textwrap.dedent(solution)
             exec(submission, global_dict)
             exec(solution, global_dict)
+
+            submission = submission[submission.find('def'):]
             func_name_sub = submission.split('(')[0][4:]
             func_name_sol = solution.split('(')[0][4:].strip()
 
@@ -128,7 +130,7 @@ class Utils():
                 if not cls.is_equal(result_sub, result_sol):
                     # cls.printt(
                     #     f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}')
-                    issue = f'Q{q_index}: {test} \nOutput: {result_sol} \nYour output: {result_sub}'
+                    issue = f'Q{q_index}: {test} \nExpected output: {result_sol} \nYour output: {result_sub}'
                     return False, issue
             return True, None
 
