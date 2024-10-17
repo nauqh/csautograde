@@ -1,0 +1,22 @@
+1: "D"
+2: "A"
+3: "A"
+4: "B"
+5: "B"
+6: "A"
+7: "C"
+8: "A"
+9: "D"
+10: "C"
+11: "C"
+12: "A"
+13: "df[df['TotalPay']>df['TotalPay'].mean()]"
+14: "df['JobTitle'].value_counts().head()"
+15: |
+    # df['JobTitle'].value_counts().head().index
+    pd.pivot_table(
+        data=df[df['JobTitle'].isin(df['JobTitle'].value_counts().head().index)],
+        index=['JobTitle'],
+        columns=['Year'],
+        values=['BasePay', 'OvertimePay', 'TotalPay']
+    )

@@ -1,0 +1,40 @@
+1: "A"
+2: "B"
+3: ["c", "e"]
+4: "B"
+5: "E"
+6: ["A", "C"]
+7: ["C", "D"]
+8: "C"
+9: |
+    def count_min_sol(my_list):
+        return my_list.count(min(my_list))
+10: |
+    def calculate_range_sol(my_tup):
+        return max(my_tup) - min(my_tup)
+11: |
+    def extract_email_sol(email, get_username):
+        return email.split('@')[0] if get_username else email.split('@')[1]
+12: |
+    def item_calculator_sol(item, get_weight):
+        weight = item['unit_weight'] * item['number_of_units']
+        cost   = item['unit_price'] * item['number_of_units']
+        return weight if get_weight else cost
+13: |
+    def heaviest_item_sol(receipt):
+        def item_calculator(item, get_weight):
+            weight = item['unit_weight'] * item['number_of_units']
+            cost   = item['unit_price'] * item['number_of_units']
+            return weight if get_weight else cost
+        weight_receipt = {item:item_calculator(
+            item_info, True) for item, item_info in receipt.items()}
+        return max(weight_receipt, key=weight_receipt.get)
+14: |
+    def priciest_item_sol(receipt):
+        def item_calculator(item, get_weight):
+            weight = item['unit_weight'] * item['number_of_units']
+            cost   = item['unit_price'] * item['number_of_units']
+            return weight if get_weight else cost
+        price_receipt = {item:item_calculator(
+            item_info, False) for item, item_info in receipt.items()}
+        return max(price_receipt, key=price_receipt.get)

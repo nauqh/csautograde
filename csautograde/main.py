@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from .utils import Utils
 import requests
 import sqlite3
-from .utils import Utils
 import pandas as pd
 import json
+import yaml
 
 
 class ExamMarkerBase(ABC):
@@ -13,11 +14,13 @@ class ExamMarkerBase(ABC):
     Subclasses must implement get_solutions() and mark_submission() method
 
     Attributes:
+        solution_url (str): The URL of the solutions JSON file
         solutions (dict): A dictionary mapping question numbers to solutions
         summary (dict): A summary of student's performance
     """
 
-    def __init__(self):
+    def __init__(self, solution_url: str):
+        self.solution_url = solution_url
         self.solutions = self.get_solutions()
         self.summary = self.initialize_summary()
 
@@ -30,9 +33,9 @@ class ExamMarkerBase(ABC):
             'Issue': [],
         }
 
-    @abstractmethod
     def get_solutions(self) -> dict:
-        pass
+        with open(self.solution_url, 'r') as f:
+            return yaml.safe_load(f)
 
     @abstractmethod
     def mark_submission(self, submission: list):
@@ -99,18 +102,13 @@ class M11Marker(ExamMarkerBase):
     }
 
     def __init__(self):
-        super().__init__()
+        super().__init__("solutions/M11.yml")
         self.exam_name = "M1.1"
         self.conn = sqlite3.connect("northwind.db")
 
-    def get_solutions(self) -> dict:
-        response = requests.get(
-            'https://raw.githubusercontent.com/nauqh/csautograde/refs/heads/master/solutions/M11.json')
-        return response.json()
-
     def check_submission(self, submission: list, is_sql: bool = False, start_index=1):
         for i, answer in enumerate(submission, start_index):
-            solution = self.solutions.get(str(i))
+            solution = self.solutions.get(i)
             correct = None
             issue = None
 
@@ -141,31 +139,12 @@ class M12Marker(ExamMarkerBase):
     }
 
     def __init__(self):
-        super().__init__()
+        super().__init__("solutions/M12.yml")
         self.exam_name = "M1.2"
-
-    def get_solutions(self) -> dict:
-        return {
-            "1": "B",
-            "2": "B",
-            "3": "D",
-            "4": ["A", "B"],
-            "5": "D",
-            "6": ["B", "D"],
-            "7": "C",
-            "8": "B",
-            "9": ["C", "D"],
-            "10": "B",
-            "11": ["A", "B"],
-            "12": ["A", "D"],
-            "13": "3",
-            "14": "200",
-            "15": "B"
-        }
 
     def check_submission(self, submission: list, start_index=1):
         for i, answer in enumerate(submission, start_index):
-            solution = self.solutions.get(str(i))
+            solution = self.solutions.get(i)
             correct = None
 
             if answer:
@@ -189,7 +168,7 @@ class M31Marker(ExamMarkerBase):
     }
 
     def __init__(self):
-        super().__init__()
+        super().__init__("solutions/M31.yml")
         self.exam_name = "M3.1"
         df = pd.read_csv(
             'https://raw.githubusercontent.com/anhquan0412/dataset/main/Salaries.csv')
@@ -197,36 +176,9 @@ class M31Marker(ExamMarkerBase):
         df['JobTitle'] = df['JobTitle'].str.title()
         self.df = df
 
-    def get_solutions(self) -> dict:
-        return {
-            "1": "D",
-            "2": "A",
-            "3": "A",
-            "4": "B",
-            "5": "B",
-            "6": "A",
-            "7": "C",
-            "8": "A",
-            "9": "D",
-            "10": "C",
-            "11": "C",
-            "12": "A",
-            "13": "df[df['TotalPay']>df['TotalPay'].mean()]",
-            "14": "df['JobTitle'].value_counts().head()",
-            "15": """
-                # df['JobTitle'].value_counts().head().index
-                pd.pivot_table(
-                    data=df[df['JobTitle'].isin(df['JobTitle'].value_counts().head().index)],
-                    index=['JobTitle'],
-                    columns=['Year'],
-                    values=['BasePay', 'OvertimePay', 'TotalPay']
-                )
-                """
-        }
-
     def check_submission(self, submission: list, start_index: int, is_expression: bool = False):
         for i, answer in enumerate(submission, start_index):
-            solution = self.solutions.get(str(i))
+            solution = self.solutions.get(i)
             correct = None
             issue = None
 
@@ -257,59 +209,9 @@ class M21Marker(ExamMarkerBase):
     }
 
     def __init__(self):
-        super().__init__()
+        super().__init__("solutions/M21.yml")
         self.exam_name = "M2.1"
         self.test_cases = self.get_test_cases()
-
-    def get_solutions(self) -> dict:
-        return {
-            "1": "A",
-            "2": "B",
-            "3": ["c", "e"],
-            "4": "B",
-            "5": "E",
-            "6": ["A", "C"],
-            "7": ["C", "D"],
-            "8": "C",
-            "9": """
-        def count_min_sol(my_list):
-            return my_list.count(min(my_list))
-    """,
-            "10": """
-        def calculate_range_sol(my_tup):
-            return max(my_tup) - min(my_tup)
-    """,
-            "11": """
-        def extract_email_sol(email, get_username):
-            return email.split('@')[0] if get_username else email.split('@')[1]
-    """,
-            "12": """
-        def item_calculator_sol(item, get_weight):
-            weight = item['unit_weight'] * item['number_of_units']
-            cost   = item['unit_price'] * item['number_of_units']
-            return weight if get_weight else cost
-    """,
-            "13": """
-        def heaviest_item_sol(receipt):
-            def item_calculator(item, get_weight):
-                weight = item['unit_weight'] * item['number_of_units']
-                cost   = item['unit_price'] * item['number_of_units']
-                return weight if get_weight else cost
-            weight_receipt = {item:item_calculator(
-                item_info, True) for item, item_info in receipt.items()}
-            return max(weight_receipt, key=weight_receipt.get)
-    """,
-            "14": """
-        def priciest_item_sol(receipt):
-            def item_calculator(item, get_weight):
-                weight = item['unit_weight'] * item['number_of_units']
-                cost   = item['unit_price'] * item['number_of_units']
-                return weight if get_weight else cost
-            price_receipt = {item:item_calculator(
-                item_info, False) for item, item_info in receipt.items()}
-            return max(price_receipt, key=price_receipt.get)
-    """
-        }
 
     def get_test_cases(self) -> dict:
         with open("solutions/M21_test_cases.json", "r") as f:
@@ -318,7 +220,7 @@ class M21Marker(ExamMarkerBase):
 
     def check_submission(self, submission: list, start_index: int, is_function: bool = False):
         for i, answer in enumerate(submission, start_index):
-            solution = self.solutions.get(str(i))
+            solution = self.solutions.get(i)
             tests = self.test_cases.get(str(i))
             correct = None
             issue = None
@@ -394,12 +296,12 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "hodominhquan.self@gmail.com"
+    email = "van.nguyen@coderschool.vn"
     response = requests.get(
-        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M11")
+        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M21")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M11Marker()
+    marker = M21Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
