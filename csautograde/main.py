@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .utils import Utils
+from utils import Utils
 import requests
 import sqlite3
 import pandas as pd
@@ -41,16 +41,20 @@ class ExamMarkerBase(ABC):
     def mark_submission(self, submission: list):
         pass
 
-    def update_summary(self, question_number: int, correct: bool | None | str, issue: str | None = None):
-        if correct is None:
-            self.summary['Not submitted'].append(question_number)
-        elif correct == True:
-            self.summary['Correct'].append(question_number)
-        elif correct == False:
-            self.summary['Incorrect'].append(question_number)
-        else:
-            self.summary['Partial'].append(question_number)
+    def update_summary(
+        self,
+        question_number: int,
+        correct: bool | None | str,
+        issue: str | None = None
+    ):
+        key = {
+            None: 'Not submitted',
+            True: 'Correct',
+            False: 'Incorrect',
+            'Partial': 'Partial'
+        }[correct]
 
+        self.summary[key].append(question_number)
         if issue:
             self.summary['Issue'].append((question_number, issue))
 
