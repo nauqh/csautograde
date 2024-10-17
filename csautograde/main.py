@@ -112,14 +112,16 @@ class M11Marker(ExamMarkerBase):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
+            issue = None
 
             if answer:
                 if is_sql:
-                    correct = Utils.check_sql(answer, solution, i, self.conn)
+                    correct, issue = Utils.check_sql(
+                        answer, solution, i, self.conn)
                 else:
                     correct = answer == solution
 
-            self.update_summary(i, correct)
+            self.update_summary(i, correct, issue)
 
     def mark_submission(self, submission: list) -> dict:
         self.check_submission(submission[:5], is_sql=False, start_index=1)
@@ -392,12 +394,12 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "van.nguyen@coderschool.vn"
+    email = "hodominhquan.self@gmail.com"
     response = requests.get(
-        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M31")
+        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M11")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M31Marker()
+    marker = M11Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)

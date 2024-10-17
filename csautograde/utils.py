@@ -186,11 +186,12 @@ class Utils():
             df_sub = pd.read_sql_query(answer, connection)
             df_sol = pd.read_sql_query(solution, connection)
             if cls.is_equal(df_sub, df_sol, same_col_name=False):
-                return True
-            return False
+                return True, None
+            return False, None
         except Exception as e:
-            cls.printt(f'Something went wrong for question {q_index}: {e}')
-            return False
+            # cls.printt(f'Something went wrong for question {q_index}: {e}')
+            issue = f'Q{q_index}: {e}'
+            return False, issue
 
     @classmethod
     def check_available(cls, variables, dict):
