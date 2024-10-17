@@ -57,7 +57,7 @@ class ExamMarkerBase(ABC):
                 return score
         return 0
 
-    def calculate_final_score(self) -> int:
+    def calculate_final_score(self) -> float:
         final_score = 0
         for key, value in self.summary.items():
             for question in value:
@@ -66,7 +66,7 @@ class ExamMarkerBase(ABC):
                     final_score += score
                 elif key == 'Partial':
                     final_score += score / 2
-        return int(final_score)
+        return final_score
 
     def display_summary(self, summary: dict):
         print(f"{self.exam_name} - EXAM SUMMARY")
@@ -80,14 +80,14 @@ class ExamMarkerBase(ABC):
                 score = (
                     f"{self.calculate_score(question)}/{self.calculate_score(question)}"
                     if key == 'Correct'
-                    else f"{int(self.calculate_score(question)/2)}/{self.calculate_score(question)}"
+                    else f"{self.calculate_score(question)/2:g}/{self.calculate_score(question)}"
                     if key == 'Partial'
                     else f"0/{self.calculate_score(question)}"
                 )
                 print(f"  - Q{question} ({score})")
 
         final_score = self.calculate_final_score()
-        print(f"FINAL SCORE: {final_score}/100")
+        print(f"FINAL SCORE: {final_score:g}/100")
 
 
 class M11Marker(ExamMarkerBase):
@@ -354,7 +354,7 @@ def calculate_score(question_number: int, QUESTION_SCORES: dict) -> int:
     return 0
 
 
-def calculate_final_score(summary, QUESTION_SCORES: dict) -> int:
+def calculate_final_score(summary, QUESTION_SCORES: dict) -> float:
     final_score = 0
     for key, value in summary.items():
         for question in value:
@@ -363,7 +363,7 @@ def calculate_final_score(summary, QUESTION_SCORES: dict) -> int:
                 final_score += score
             elif key == 'Partial':
                 final_score += score / 2
-    return int(final_score)
+    return final_score
 
 
 def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
@@ -378,14 +378,14 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
             score = (
                 f"{calculate_score(question, rubrics)}/{calculate_score(question, rubrics)}"
                 if key == 'Correct'
-                else f"{int(calculate_score(question, rubrics)/2)}/{calculate_score(question, rubrics)}"
+                else f"{calculate_score(question, rubrics)/2:g}/{calculate_score(question, rubrics)}"
                 if key == 'Partial'
                 else f"0/{calculate_score(question, rubrics)}"
             )
             result += f"  - Q{question} ({score})\n"
 
     final_score = calculate_final_score(summary, rubrics)
-    result += f"FINAL SCORE: {final_score}/100\n"
+    result += f"FINAL SCORE: {final_score:g}/100\n"
 
     return result
 
