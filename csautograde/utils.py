@@ -90,16 +90,6 @@ class Utils():
         return a_val == b_val
 
     @classmethod
-    def check_value(cls, submission, solution):
-        try:
-            assert cls.is_equal(solution, submission)
-            cls.printt('You passed! Good job!')
-            return True
-        except Exception as e:
-            cls.printt('Your solution is not correct, try again')
-            return False
-
-    @classmethod
     def check_expression(cls, submission, solution, q_index, global_dict):
         if not isinstance(submission, str):
             cls.printt("Your expression answer must be a string")
@@ -192,12 +182,3 @@ class Utils():
             # cls.printt(f'Something went wrong for question {q_index}: {e}')
             issue = f'Q{q_index}: {e}'
             return False, issue
-
-    @classmethod
-    def check_available(cls, variables, dict):
-        for v in variables:
-            if v not in dict:
-                print(
-                    f'{v} is not defined. Please make sure you have run the code to define it.')
-                return False
-        return True
