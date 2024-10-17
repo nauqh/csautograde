@@ -3,6 +3,7 @@ from functools import partial
 import pandas as pd
 import numpy as np
 import textwrap
+import ast
 
 
 class Utils():
@@ -100,18 +101,39 @@ class Utils():
 
     @classmethod
     def check_expression(cls, submission, solution, q_index, global_dict):
-        if (not isinstance(submission, str)):
+        if not isinstance(submission, str):
             cls.printt("Your expression answer must be a string")
             return 'INVALID'
+
         try:
-            result = eval(textwrap.dedent(solution), global_dict)
-            result_sub = eval(submission, global_dict)
-            if cls.is_equal(result, result_sub):
-                return True
-            return False
+            def is_assignment(code):
+                try:
+                    tree = ast.parse(code)
+                    return isinstance(tree.body[0], ast.Assign)
+                except Exception:
+                    return False
+
+            # If it's an assignment, extract the right-hand side of the assignment (the expression)
+            if is_assignment(submission):
+                submission_expr = submission.split('=', 1)[1].strip()
+            else:
+                submission_expr = submission.strip()
+
+            # Evaluate both the submission and the solution expressions in the provided global context
+            result_sol = eval(textwrap.dedent(solution), global_dict)
+            result_sub = eval(textwrap.dedent(submission_expr), global_dict)
+
+            # Check if the results are closely equal using the existing equality checks
+            if cls.is_equal(result_sol, result_sub):
+                if is_assignment(submission):
+                    return "Partial", f"Q{q_index}: Submission is in wrong format"
+                return True, None
+            else:
+                return False, None
         except Exception as e:
-            cls.printt(f'Something went wrong for question {q_index}: {e}')
-            return False
+            # cls.printt(f'Something went wrong for question {q_index}: {e}')
+            issue = f'Q{q_index}: {e}'
+            return False, issue
 
     @classmethod
     def check_function(cls, submission, solution, global_dict, q_index, tests=None):

@@ -226,17 +226,18 @@ class M31Marker(ExamMarkerBase):
         for i, answer in enumerate(submission, start_index):
             solution = self.solutions.get(str(i))
             correct = None
+            issue = None
 
             if answer:
                 if is_expression:
                     global_dict = globals().copy()
                     global_dict['df'] = self.df
-                    correct = Utils.check_expression(
+                    correct, issue = Utils.check_expression(
                         answer, solution, i, global_dict)
                 else:
                     correct = answer == solution
 
-            self.update_summary(i, correct)
+            self.update_summary(i, correct, issue)
 
     def mark_submission(self, submission: list) -> dict:
         self.check_submission(
@@ -393,10 +394,10 @@ if __name__ == '__main__':
     import requests
     email = "van.nguyen@coderschool.vn"
     response = requests.get(
-        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M21")
+        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam=M31")
     submission = response.json()['answers']
     s = [question['answer'] for question in submission]
 
-    marker = M21Marker()
+    marker = M31Marker()
     marker.mark_submission(s)
     marker.display_summary(marker.summary)
