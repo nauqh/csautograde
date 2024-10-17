@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from utils import Utils
+from .utils import Utils
 import requests
 import sqlite3
 import pandas as pd
