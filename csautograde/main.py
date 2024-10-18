@@ -11,8 +11,6 @@ class ExamMarkerBase(ABC):
     """
     Abstract base class for ExamMarker classes
 
-    Subclasses must implement get_solutions() and mark_submission() method
-
     Attributes:
         solution_url (str): The URL of the solutions JSON file
         solutions (dict): A dictionary mapping question numbers to solutions
