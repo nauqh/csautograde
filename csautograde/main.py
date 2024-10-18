@@ -293,7 +293,7 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
     final_score = calculate_final_score(summary, rubrics)
     result += f"FINAL SCORE: {final_score:g}/100\n"
 
-    return result
+    return result, final_score
 
 
 if __name__ == '__main__':
