@@ -15,6 +15,8 @@ class SubmissionResponse(BaseModel):
     answers: list
     exam_id: str
     submitted_at: Optional[datetime]
+    summary: str
+    score: float
 
 
 class Exam(BaseModel):

@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
-import requests
 
 from sqlalchemy.orm import Session
 from .schemas import Submission, SubmissionResponse
@@ -11,14 +10,14 @@ from . import models
 from .database import engine, get_db
 
 # Routers
-from .routers import submission, exam
+from .routers import exams
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title='CS Exam Python Client',
     summary="Client for learner submissions",
-    version='0.0.6'
+    version='0.0.10'
 )
 
 app.add_middleware(
@@ -29,8 +28,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# app.include_router(submission.router)
-app.include_router(exam.router)
+app.include_router(exams.router)
 
 
 @app.get("/")
@@ -46,24 +44,33 @@ MARKER_CLASSES = {
 }
 
 
-@app.get("/submissions", response_model=SubmissionResponse)
-async def get_submission(email: str, exam: str, db: Session = Depends(get_db)):
-    """Get a submission by email and exam.
-
-    Returns:
-        The submission.
-    """
+def validate_email(email: str, db: Session):
+    """Validate email exists in database."""
     email_exists = db.query(models.Submission).filter(
         models.Submission.email == email).first()
     if not email_exists:
         raise HTTPException(
             status_code=404, detail=f"Email {email} not found")
 
+
+def validate_exam(exam: str, db: Session):
+    """Validate exam exists in database."""
     exam_exists = db.query(models.Exam).filter(
         models.Exam.id == exam).first()
     if not exam_exists:
         raise HTTPException(
             status_code=404, detail=f"Exam {exam} not found")
+
+
+@app.get("/submissions/{exam}/{email}", response_model=SubmissionResponse)
+async def get_submission(exam: str, email: str, db: Session = Depends(get_db)):
+    """Get a submission by email and exam.
+
+    Returns:
+        The submission.
+    """
+    validate_email(email, db)
+    validate_exam(exam, db)
 
     assignment = db.query(models.Submission).filter(
         models.Submission.email == email,
@@ -84,31 +91,14 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
     Returns:
         A message indicating the submission was added.
     """
-    submission = models.Submission(**data.model_dump())
-    db.add(submission)
-    db.commit()
+    # Generate marking summary
+    s = [question['answer'] for question in data.answers]
 
-    return f"Added submission for {submission.email}"
-
-
-@app.get("/autograde")
-def get_autograde(email: str, exam: str):
-    response = requests.get(
-        f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam={exam}")
-
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=response.json()['detail']
-        )
-    submission = response.json()['answers']
-    s = [question['answer'] for question in submission]
-
-    MarkerClass = MARKER_CLASSES.get(exam.upper())
+    MarkerClass = MARKER_CLASSES.get(data.exam_id.upper())
     if MarkerClass is None:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid exam type: {exam}"
+            detail=f"Invalid exam type: {exams}"
         )
 
     marker = MarkerClass()
@@ -116,8 +106,66 @@ def get_autograde(email: str, exam: str):
 
     summary, final_score = create_summary(
         marker.exam_name, marker.summary, marker.QUESTION_SCORES)
-    return {
-        'submission': s,
-        'summary': summary,
-        'final_score': final_score
-    }
+
+    # Save to database
+    submission = models.Submission(**data.model_dump())
+    submission.summary = summary
+    submission.score = final_score
+
+    db.add(submission)
+    db.commit()
+
+    return f"Added submission for {submission.email}"
+
+
+@app.put("/submissions/{exam}/{email}", response_model=SubmissionResponse)
+async def update_submission(email: str, exam: str, new_score: int, db: Session = Depends(get_db)):
+    """Update the score of a submission
+
+    Returns:
+        The updated submission
+    """
+    validate_email(email, db)
+    validate_exam(exam, db)
+
+    submission = db.query(models.Submission).filter(
+        models.Submission.email == email,
+        models.Submission.exam_id == exam
+    ).order_by(models.Submission.submitted_at.desc()).first()
+
+    submission.score = new_score
+    db.commit()
+
+    return submission
+
+
+# @app.get("/autograde")
+# def get_autograde(email: str, exam: str):
+#     response = requests.get(
+#         f"https://cspyexamclient.up.railway.app/submissions?email={email}&exam={exam}")
+
+#     if response.status_code != 200:
+#         raise HTTPException(
+#             status_code=response.status_code,
+#             detail=response.json()['detail']
+#         )
+#     submission = response.json()['answers']
+#     s = [question['answer'] for question in submission]
+
+#     MarkerClass = MARKER_CLASSES.get(exam.upper())
+#     if MarkerClass is None:
+#         raise HTTPException(
+#             status_code=400,
+#             detail=f"Invalid exam type: {exam}"
+#         )
+
+#     marker = MarkerClass()
+#     marker.mark_submission(s)
+
+#     summary, final_score = create_summary(
+#         marker.exam_name, marker.summary, marker.QUESTION_SCORES)
+#     return {
+#         'submission': s,
+#         'summary': summary,
+#         'final_score': final_score
+#     }

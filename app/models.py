@@ -15,8 +15,8 @@ class Submission(Base):
                           server_default=func.now(), nullable=False)
 
     # Added after auto-graded
-    # summary = Column(String)
-    # score = Column(Integer)
+    summary = Column(String)
+    score = Column(Integer)
 
     exam = relationship("Exam", back_populates="submissions")
 
