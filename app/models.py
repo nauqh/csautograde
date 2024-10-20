@@ -14,9 +14,11 @@ class Submission(Base):
     submitted_at = Column(DateTime(timezone=True),
                           server_default=func.now(), nullable=False)
 
-    # Added after auto-graded
     summary = Column(String)
     score = Column(Integer)
+
+    # Discord thread that this submission was posted in, added when call /submmit
+    channel = Column(String)
 
     exam = relationship("Exam", back_populates="submissions")
 

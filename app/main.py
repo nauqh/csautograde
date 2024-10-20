@@ -120,6 +120,22 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
     return f"Added submission for {submission.email}"
 
 
+@app.put("/channels/{email}/{exam}", response_model=SubmissionResponse)
+async def update_submission_channel(email: str, exam: str, channel: str, db: Session = Depends(get_db)):
+    submission = db.query(models.Submission).filter(
+        models.Submission.email == email,
+        models.Submission.exam_id == exam
+    ).order_by(models.Submission.submitted_at.desc()).first()
+
+    if submission is None:
+        raise HTTPException(
+            status_code=404, detail="No submission found for the provided email and exam.")
+    submission.channel = channel
+    db.commit()
+
+    return submission
+
+
 @app.put("/submissions/{exam}/{email}", response_model=SubmissionResponse)
 async def update_submission(email: str, exam: str, new_score: int, db: Session = Depends(get_db)):
     """Update the score of a submission

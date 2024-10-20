@@ -17,6 +17,7 @@ class SubmissionResponse(BaseModel):
     submitted_at: Optional[datetime]
     summary: str
     score: float
+    channel: Optional[str]
 
 
 class Exam(BaseModel):
