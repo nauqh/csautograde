@@ -135,6 +135,9 @@ async def update_submission(email: str, exam: str, new_score: int, db: Session =
         models.Submission.exam_id == exam
     ).order_by(models.Submission.submitted_at.desc()).first()
 
+    if submission is None:
+        raise HTTPException(
+            status_code=404, detail="No submission found for the provided email and exam.")
     submission.score = new_score
     db.commit()
 
