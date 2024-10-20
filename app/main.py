@@ -183,7 +183,8 @@ async def get_submission_history(email: str, db: Session = Depends(get_db)):
         {
             "submitted_at": submission.submitted_at.astimezone(timezone("Asia/Bangkok")).strftime("%Y-%m-%d %H:%M:%S"),
             "exam": submission.exam.name,
-            "score": submission.score
+            "score": submission.score,
+            "channel": submission.channel
         }
         for submission in submissions
     ]

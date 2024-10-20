@@ -30,3 +30,4 @@ class SubmissionHistory(BaseModel):
     submitted_at: datetime
     exam: str
     score: float
+    channel: str
