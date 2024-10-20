@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
-from datetime import datetime
 from pytz import timezone
 
 from sqlalchemy.orm import Session
@@ -120,8 +119,11 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
     return f"Added submission for {submission.email}"
 
 
-@app.put("/channels/{email}/{exam}", response_model=SubmissionResponse)
-async def update_submission_channel(email: str, exam: str, channel: str, db: Session = Depends(get_db)):
+@app.put("/channels/{exam}/{email}", response_model=SubmissionResponse)
+async def update_submission_channel(exam: str, email: str,  channel: str, db: Session = Depends(get_db)):
+    validate_email(email, db)
+    validate_exam(exam, db)
+
     submission = db.query(models.Submission).filter(
         models.Submission.email == email,
         models.Submission.exam_id == exam
@@ -137,7 +139,7 @@ async def update_submission_channel(email: str, exam: str, channel: str, db: Ses
 
 
 @app.put("/submissions/{exam}/{email}", response_model=SubmissionResponse)
-async def update_submission(email: str, exam: str, new_score: int, db: Session = Depends(get_db)):
+async def update_submission(exam: str, email: str, new_score: int, db: Session = Depends(get_db)):
     """Update the score of a submission
 
     Returns:
