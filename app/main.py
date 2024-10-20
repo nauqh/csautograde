@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
+from datetime import datetime
+from pytz import timezone
 
 from sqlalchemy.orm import Session
-from .schemas import Submission, SubmissionResponse
+from .schemas import Submission, SubmissionResponse, SubmissionHistory
 
 # Database
 from . import models
@@ -137,6 +139,35 @@ async def update_submission(email: str, exam: str, new_score: int, db: Session =
     db.commit()
 
     return submission
+
+
+@app.get("/history/{email}", response_model=list[SubmissionHistory])
+async def get_submission_history(email: str, db: Session = Depends(get_db)):
+    """
+    Get submission history for a learner by email.
+    """
+    validate_email(email, db)
+
+    # Query all submissions by the given email, ordered by the submission date
+    submissions = db.query(models.Submission).filter(
+        models.Submission.email == email
+    ).order_by(models.Submission.submitted_at.desc()).all()
+
+    if not submissions:
+        raise HTTPException(
+            status_code=404, detail="No submissions found for the provided email.")
+
+    # Prepare and return the submission history
+    submission_history = [
+        {
+            "submitted_at": submission.submitted_at.astimezone(timezone("Asia/Bangkok")).strftime("%Y-%m-%d %H:%M:%S"),
+            "exam": submission.exam.name,
+            "score": submission.score
+        }
+        for submission in submissions
+    ]
+
+    return submission_history
 
 
 # @app.get("/autograde")

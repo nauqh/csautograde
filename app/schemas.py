@@ -23,3 +23,9 @@ class Exam(BaseModel):
     id: str
     name: str
     url: str
+
+
+class SubmissionHistory(BaseModel):
+    submitted_at: datetime
+    exam: str
+    score: float
