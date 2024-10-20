@@ -151,7 +151,7 @@ async def get_submission_history(email: str, db: Session = Depends(get_db)):
     # Query all submissions by the given email, ordered by the submission date
     submissions = db.query(models.Submission).filter(
         models.Submission.email == email
-    ).order_by(models.Submission.submitted_at.desc()).all()
+    ).order_by(models.Submission.submitted_at.asc()).all()
 
     if not submissions:
         raise HTTPException(
