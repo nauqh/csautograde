@@ -175,10 +175,10 @@ class Utils():
         try:
             df_sub = pd.read_sql_query(answer, connection)
             df_sol = pd.read_sql_query(solution, connection)
-            if cls.is_equal(df_sub, df_sol, same_col_name=False):
-                return True, None
-            return False, None
+            if not cls.is_df_equal(df_sub, df_sol, same_col_name=False):
+                issue = f'Q{q_index}:\nExpected output:\n {df_sol} \nYour output:\n {df_sub}'
+                return False, issue
+            return True, None
         except Exception as e:
-            # cls.printt(f'Something went wrong for question {q_index}: {e}')
             issue = f'Q{q_index}: {e}'
             return False, issue
