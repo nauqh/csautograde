@@ -176,7 +176,7 @@ class Utils():
             df_sub = pd.read_sql_query(answer, connection)
             df_sol = pd.read_sql_query(solution, connection)
             if not cls.is_df_equal(df_sub, df_sol, same_col_name=False):
-                issue = f'Q{q_index}:\nExpected output:\n {df_sol} \nYour output:\n {df_sub}'
+                issue = f'Q{q_index}:\nExpected output:\n {df_sol} \nYour output:\n {df_sub}\n'
                 return False, issue
             return True, None
         except Exception as e:
