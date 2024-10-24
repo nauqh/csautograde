@@ -121,7 +121,7 @@ class M11Marker(ExamMarkerBase):
                 else:
                     correct = answer == solution
 
-            self.update_summary(i, correct, issue)
+            self.update_summary(i, correct, None)
 
     def mark_submission(self, submission: list) -> dict:
         self.check_submission(submission[:5], is_sql=False, start_index=1)
