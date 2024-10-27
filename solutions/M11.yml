@@ -68,7 +68,7 @@
     GROUP BY s.CompanyName
     HAVING COUNT(p.ProductID) = 1;
 17: |
-    SELECT DISTINCT e.EmployeeID, e.FirstName, e.LastName
+    SELECT DISTINCT e.EmployeeID, e.LastName, e.FirstName
     FROM Employees e
     JOIN Orders o ON e.EmployeeID = o.EmployeeID
     JOIN Customers c ON c.CustomerID = o.CustomerID
