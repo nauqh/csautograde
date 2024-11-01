@@ -57,7 +57,7 @@
     JOIN Products p on od.ProductID = p.ProductID
     WHERE p.ProductName = 'Tofu';
 15: |
-    SELECT c.CustomerID, c.CompanyName
+    SELECT c.CustomerID, c.CompanyName as "UnorderedCustomers"
     FROM Customers c
     LEFT JOIN Orders o on c.CustomerID = o.CustomerID
     WHERE o.OrderID IS NULL;
