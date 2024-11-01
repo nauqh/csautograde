@@ -43,7 +43,7 @@
     JOIN Orders o on e.EmployeeID = o.EmployeeID
     JOIN "Order Details" od on od.OrderID = o.OrderID
     GROUP BY e.EmployeeID
-    ORDER BY '#Products' DESC;
+    ORDER BY SUM(od.Quantity) DESC;
 13: |
     SELECT STRFTIME('%Y', OrderDate) AS Year, COUNT(OrderID) as '#Orders', ShipRegion
     FROM Orders
