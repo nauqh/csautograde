@@ -106,13 +106,11 @@ class M11Marker(ExamMarkerBase):
     def __init__(self):
         super().__init__("solutions/M11.yml")
         self.exam_name = "M1.1"
-        # self.conn = sqlite3.connect("northwind.db")
         response = requests.get(
             'https://github.com/nauqh/csautograde/blob/master/northwind.db?raw=true')
         with open("northwind.db", "wb") as file:
             file.write(response.content)
 
-        # conn = sqlite3.connect("olist.db")
         self.conn = sqlite3.connect("northwind.db")
 
     def check_submission(self, submission: list, is_sql: bool = False, start_index=1):
@@ -128,7 +126,7 @@ class M11Marker(ExamMarkerBase):
                 else:
                     correct = answer == solution
 
-            self.update_summary(i, correct, issue)
+            self.update_summary(i, correct, None)
 
     def mark_submission(self, submission: list) -> dict:
         self.check_submission(submission[:5], is_sql=False, start_index=1)
@@ -305,7 +303,7 @@ def create_summary(exam_name: str, summary: dict, rubrics: dict) -> str:
 
 if __name__ == '__main__':
     import requests
-    email = "nguyen.thien.khanh.1412@gmail.com"
+    email = "honghientt.1707@gmail.com"
     response = requests.get(
         f"https://cspyexamclient.up.railway.app/submissions/M11/{email}")
     submission = response.json()['answers']
