@@ -36,8 +36,7 @@ FROM
     customers c
     JOIN invoices i ON c.CustomerId = i.CustomerId
 GROUP BY
-    c.CustomerId,
-    CustomerName
+    c.CustomerId
 Having
     TotalSpent > 40
 ORDER BY
@@ -114,45 +113,6 @@ GROUP BY
 ORDER BY
     AlbumRank;
 
--- 9. Find the most purchased tracks for each playlist.
-WITH
-    RankedTracks AS (
-        SELECT
-            p.PlaylistId,
-            p.Name AS PlaylistName,
-            t.Name AS TrackName,
-            COUNT(ii.InvoiceLineId) AS PurchaseCount,
-            RANK() OVER (
-                PARTITION BY
-                    p.PlaylistId
-                ORDER BY
-                    COUNT(ii.InvoiceLineId) DESC
-            ) AS TrackRank
-        FROM
-            playlists p
-            JOIN playlist_track pt ON p.PlaylistId = pt.PlaylistId
-            JOIN tracks t ON pt.TrackId = t.TrackId
-            JOIN invoice_items ii ON t.TrackId = ii.TrackId
-        GROUP BY
-            p.PlaylistId,
-            p.Name,
-            t.TrackId,
-            t.Name
-    )
-SELECT
-    -- PlaylistId,
-    PlaylistName,
-    TrackName,
-    PurchaseCount,
-    -- TrackRank
-FROM
-    RankedTracks
-WHERE
-    TrackRank = 1
-ORDER BY
-    PlaylistName,
-    TrackName;
-
 -- 10. Count the number of invoices generated each year.
 SELECT
     strftime ('%Y', i.InvoiceDate) AS InvoiceYear,
@@ -177,7 +137,7 @@ GROUP BY
 ORDER BY
     YearMonth ASC;
 
--- 12. Find the total amount each customer spent each month. Include only customers who spent more than $45. 
+-- 12. Find the total amount each customer spent each month. Include only customers who spent more than $45 in total. 
 -- Display their full name and order the results by customer name and month.
 WITH
     MonthlySales AS (
@@ -215,9 +175,8 @@ ORDER BY
     ms.CustomerName,
     ms.Month;
 
--- Find the total amount that each customer spent each month. Display their fullname and order by customer ID and month.
+-- Find the total amount that each customer spent each month. Display their fullname and order by customer name and month.
 SELECT
-    c.CustomerId,
     c.FirstName || ' ' || c.LastName AS CustomerName,
     strftime ('%m', i.InvoiceDate) AS Month,
     SUM(i.Total) AS MonthlyTotal
