@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from csautograde import M12Marker, M11Marker, M21Marker, M31Marker, create_summary
 from pytz import timezone
@@ -9,6 +9,7 @@ from .schemas import Submission, SubmissionResponse, SubmissionHistory
 # Database
 from . import models
 from .database import engine, get_db
+from .websocket import manager
 
 # Routers
 from .routers import exams
@@ -30,6 +31,16 @@ app.add_middleware(
 )
 
 app.include_router(exams.router)
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except Exception:
+        manager.disconnect(websocket)
 
 
 @app.get("/")
@@ -115,6 +126,15 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
 
     db.add(submission)
     db.commit()
+
+    notification = {
+        "type": "submission",
+        "content": {
+            "exam": submission.exam.name,
+            "email": submission.email,
+        }
+    }
+    await manager.broadcast(notification)
 
     return f"Added submission for {submission.email}"
 
