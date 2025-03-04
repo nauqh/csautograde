@@ -128,7 +128,7 @@ async def add_submission(data: Submission, db: Session = Depends(get_db)):
     db.commit()
 
     notification = {
-        "type": "submission",
+        "type": "new_submission",
         "content": {
             "exam": submission.exam.name,
             "email": submission.email,
